@@ -1,0 +1,25 @@
+.load-more {
+    display: block;
+    padding: 5px 10px;
+    margin: 0 auto;
+    margin-bottom: 20px;
+
+    font-size: 17px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+
+    color: #6f4e37;
+    background-color: #cdb79e;
+    border-radius: 8px;
+    border: 1px solid #696969;
+
+    &:hover,
+    &:focus {
+        color: #cdb79e;
+        background-color: #6f4e37;
+    }
+
+    &.hidden {
+        display: none;
+    }
+}
