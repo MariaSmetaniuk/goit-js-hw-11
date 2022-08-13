@@ -8,7 +8,7 @@ const refs = {
   gallery: document.querySelector('.gallery'),
   loadMoreBtn: document.querySelector('.load-more'),
 };
-
+// глобальні змінні
 let page = null;
 let totalPages = null;
 const per_page = 40;
@@ -20,7 +20,7 @@ const lightbox = new SimpleLightbox('.gallery a', {
 });
 
 const getSearchQuery = () => {
-  refs.searchForm.elements.searchQuery.value.trim();
+  return refs.searchForm.elements.searchQuery.value.trim();
 };
 const showLoadMoreBtn = () => {
   refs.loadMoreBtn.classList.remove('hidden');
@@ -72,16 +72,27 @@ const renderGallery = photoCards => {
 const removeMarkup = () => {
   refs.gallery.innerHTML = '';
 };
+// функція плавного скролу
+const smoothScroll = () => {
+  const { height: cardHeight } = document
+    .querySelector('.gallery')
+    .firstElementChild.getBoundingClientRect();
 
-const onSearch = async searchQuery => {
+  window.scrollBy({
+    top: cardHeight * 2,
+    behavior: 'smooth',
+  });
+};
+// функція обробки пошуку карток зображень
+const searchHandler = async searchQuery => {
   try {
     const data = await fetchPhotoCards(searchQuery, page, per_page);
-    totalPages = Math.ceil(data.totalHits / per_page);
     if (data.hits.length === 0) {
       Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.'
       );
     } else {
+      totalPages = Math.ceil(data.totalHits / per_page);
       if (page === 1) {
         Notify.info(`Hooray! We found ${data.totalHits} images.`);
       }
@@ -93,8 +104,8 @@ const onSearch = async searchQuery => {
     console.log(error);
   }
 };
-
-const onSearchBtnClick = e => {
+// функції обробки кліку кнопок
+const onSearchBtnClick = async e => {
   e.preventDefault();
   removeMarkup();
   hideLoadMoreBtn();
@@ -102,14 +113,15 @@ const onSearchBtnClick = e => {
   page = 1;
 
   if (searchQuery !== '') {
-    onSearch(searchQuery);
-    setTimeout(showLoadMoreBtn, 200);
+    await searchHandler(searchQuery);
+    showLoadMoreBtn();
   }
 };
-
-const onLoadMoreBtnClick = () => {
+const onLoadMoreBtnClick = async () => {
   const searchQuery = getSearchQuery();
-  onSearch(searchQuery);
+  await searchHandler(searchQuery);
+  smoothScroll();
+
   if (page >= totalPages) {
     hideLoadMoreBtn();
     Notify.info("We're sorry, but you've reached the end of search results.");
