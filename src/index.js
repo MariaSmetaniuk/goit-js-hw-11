@@ -62,7 +62,7 @@ const renderGallery = photoCards => {
       <span>${downloads}</span>
     </p>
   </div>
-</div>`;
+  </div>`;
       }
     )
     .join('');
@@ -97,6 +97,15 @@ const searchHandler = async searchQuery => {
         Notify.info(`Hooray! We found ${data.totalHits} images.`);
       }
       renderGallery(data.hits);
+
+      if (page >= totalPages) {
+        hideLoadMoreBtn();
+        Notify.info(
+          "We're sorry, but you've reached the end of search results."
+        );
+      } else {
+        showLoadMoreBtn();
+      }
       page += 1;
       lightbox.refresh();
     }
@@ -114,18 +123,12 @@ const onSearchBtnClick = async e => {
 
   if (searchQuery !== '') {
     await searchHandler(searchQuery);
-    showLoadMoreBtn();
   }
 };
 const onLoadMoreBtnClick = async () => {
   const searchQuery = getSearchQuery();
   await searchHandler(searchQuery);
   smoothScroll();
-
-  if (page >= totalPages) {
-    hideLoadMoreBtn();
-    Notify.info("We're sorry, but you've reached the end of search results.");
-  }
 };
 
 refs.searchForm.addEventListener('submit', onSearchBtnClick);
